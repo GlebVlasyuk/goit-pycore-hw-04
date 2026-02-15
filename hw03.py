@@ -4,47 +4,45 @@ from pathlib import Path
 from colorama import Fore, Style, init
 
 
-def print_directory_tree(directory: Path, prefix: str = "") -> None:
+def show_tree(folder_path, indent=""):
     try:
-        entries = sorted(
-            directory.iterdir(),
-            key=lambda item: (item.is_file(), item.name.lower()),
-        )
+        items = list(folder_path.iterdir())
+        items.sort(key=lambda x: x.name.lower())
     except OSError as error:
-        print(f"{prefix}{Fore.RED}[ERROR]{Style.RESET_ALL} {error}")
+        print(f"{indent}{Fore.RED}Cannot read directory: {error}{Style.RESET_ALL}")
         return
 
-    for index, entry in enumerate(entries):
-        is_last = index == len(entries) - 1
+    for i, item in enumerate(items):
+        is_last = i == len(items) - 1
         branch = "`-- " if is_last else "|-- "
-        child_prefix = "    " if is_last else "|   "
+        next_indent = indent + ("    " if is_last else "|   ")
 
-        if entry.is_dir():
-            print(f"{prefix}{branch}{Fore.BLUE}{entry.name}{Style.RESET_ALL}/")
-            print_directory_tree(entry, prefix + child_prefix)
+        if item.is_dir():
+            print(f"{indent}{branch}{Fore.BLUE}{item.name}{Style.RESET_ALL}/")
+            show_tree(item, next_indent)
         else:
-            print(f"{prefix}{branch}{Fore.GREEN}{entry.name}{Style.RESET_ALL}")
+            print(f"{indent}{branch}{Fore.GREEN}{item.name}{Style.RESET_ALL}")
 
 
-def main() -> None:
+def main():
     init(autoreset=True)
 
     if len(sys.argv) != 2:
         print(f"Usage: python {Path(sys.argv[0]).name} /path/to/directory")
         sys.exit(1)
 
-    directory = Path(sys.argv[1]).expanduser().resolve()
+    folder = Path(sys.argv[1]).expanduser().resolve()
 
-    if not directory.exists():
+    if not folder.exists():
         print(f"{Fore.RED}Error:{Style.RESET_ALL} Path does not exist.")
         sys.exit(1)
 
-    if not directory.is_dir():
+    if not folder.is_dir():
         print(f"{Fore.RED}Error:{Style.RESET_ALL} Path is not a directory.")
         sys.exit(1)
 
-    print(f"{Fore.CYAN}{directory.name}{Style.RESET_ALL}/")
-    print_directory_tree(directory)
+    print(f"{Fore.CYAN}{folder.name}{Style.RESET_ALL}/")
+    show_tree(folder)
 
 
 if __name__ == "__main__":
