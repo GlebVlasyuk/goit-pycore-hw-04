@@ -17,7 +17,7 @@ def add_contact(args: list[str], contacts: dict[str, str]) -> str:
     return "Contact added."
 
 
-def update_contact(args: list[str], contacts: dict[str, str]) -> str:
+def change_contact(args: list[str], contacts: dict[str, str]) -> str:
     if len(args) != 2:
         return "Invalid command."
 
@@ -35,14 +35,6 @@ def show_phone(args: list[str], contacts: dict[str, str]) -> str:
 
     name = args[0]
     return contacts.get(name, "Contact not found.")
-
-
-def show_contact_by_phone(phone: str, contacts: dict[str, str]) -> str:
-    for name, saved_phone in contacts.items():
-        if saved_phone == phone:
-            return f"{name}: {saved_phone}"
-    return "Contact not found."
-
 
 def show_all_contacts(contacts: dict[str, str]) -> str:
     if not contacts:
@@ -66,28 +58,11 @@ def main() -> None:
         if command == "hello":
             print("How can I help you?")
         elif command == "add":
-            if len(args) == 0:
-                name = input("Enter name: ").strip()
-                phone = input("Enter phone: ").strip()
-                args = [name, phone]
-            elif len(args) == 1:
-                phone = input("Enter phone: ").strip()
-                args = [args[0], phone]
-
             print(add_contact(args, contacts))
         elif command == "change":
-            print(update_contact(args, contacts))
+            print(change_contact(args, contacts))
         elif command == "phone":
-            search_type = input("Search by phone or name? ").strip().lower()
-
-            if search_type == "name":
-                name = args[0] if len(args) == 1 else input("Enter name: ").strip()
-                print(show_phone([name], contacts))
-            elif search_type == "phone":
-                phone = args[0] if len(args) == 1 else input("Enter phone: ").strip()
-                print(show_contact_by_phone(phone, contacts))
-            else:
-                print("Invalid command.")
+            print(show_phone(args, contacts))
         elif command == "all":
             print(show_all_contacts(contacts))
         else:
